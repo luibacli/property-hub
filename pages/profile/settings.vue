@@ -9,6 +9,8 @@ const authStore = useAuthStore()
 const uiStore = useUiStore()
 const router = useRouter()
 
+const showDeleteModal = ref(false)
+
 // ── Profile form ──────────────────────────────────────────────────────────────
 const profileForm = reactive({ name: authStore.user?.name ?? '' })
 const profileErrors = ref<Record<string, string>>({})
@@ -156,12 +158,40 @@ async function changePassword() {
         </div>
 
         <!-- Danger zone -->
-        <div class="card p-6 border-red-200 dark:border-red-900">
+        <div class="card p-6 border border-red-200 dark:border-red-900/50">
           <h2 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Danger zone</h2>
-          <p class="text-sm text-zinc-500 dark:text-zinc-400 mb-4">These actions are irreversible on this demo account.</p>
-          <AppButton variant="danger" size="sm" @click="router.push('/profile')">Delete account</AppButton>
+          <p class="text-sm text-zinc-500 dark:text-zinc-400 mb-4">Permanently delete your account and all associated data.</p>
+          <AppButton variant="danger" size="sm" @click="showDeleteModal = true">Delete account</AppButton>
         </div>
       </div>
     </div>
+
+    <!-- Delete account confirmation modal -->
+    <Teleport to="body">
+      <Transition name="fade">
+        <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div class="absolute inset-0 bg-zinc-950/60 backdrop-blur-sm" @click="showDeleteModal = false" />
+          <div class="relative w-full max-w-sm card p-6 animate-fade-up">
+            <div class="size-12 rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-6 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h3 class="text-base font-semibold text-zinc-900 dark:text-zinc-100 text-center mb-1">Delete account?</h3>
+            <p class="text-sm text-zinc-500 dark:text-zinc-400 text-center mb-2">This would permanently remove your account, listings, and saved properties.</p>
+            <p class="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded-lg px-3 py-2 text-center mb-6">
+              This is a demo app — account deletion is disabled.
+            </p>
+            <div class="flex gap-3">
+              <AppButton variant="secondary" full @click="showDeleteModal = false">Cancel</AppButton>
+              <AppButton variant="danger" full disabled>Delete account</AppButton>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
+
+<style scoped>
+.fade-enter-active, .fade-leave-active { @apply transition-opacity duration-200; }
+.fade-enter-from, .fade-leave-to { @apply opacity-0; }
+</style>

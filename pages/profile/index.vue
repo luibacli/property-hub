@@ -34,12 +34,18 @@ const { data: favListings, pending: favPending } = await useAsyncData<Property[]
 
 // ── Delete listing ────────────────────────────────────────────────────────────
 const deletingId = ref<string | null>(null)
+const confirmDeleteId = ref<string | null>(null)
 
-async function deleteListing(id: string) {
-  if (!confirm('Are you sure you want to delete this listing?')) return
-  deletingId.value = id
+function requestDelete(id: string) {
+  confirmDeleteId.value = id
+}
+
+async function confirmDelete() {
+  if (!confirmDeleteId.value) return
+  deletingId.value = confirmDeleteId.value
+  confirmDeleteId.value = null
   try {
-    await $fetch(`/api/listings/${id}`, { method: 'DELETE' })
+    await $fetch(`/api/listings/${deletingId.value}`, { method: 'DELETE' })
     uiStore.success('Listing deleted')
     await refresh()
   } catch {
@@ -81,6 +87,13 @@ async function handleLogout() {
             <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Add listing
           </AppButton>
+          <button
+            class="size-8 rounded-xl border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            aria-label="Account settings"
+            @click="router.push('/profile/settings')"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 0 4.93 19.07 10 10 0 0 0 19.07 4.93z"/></svg>
+          </button>
           <AppButton size="sm" variant="ghost" @click="handleLogout">Sign out</AppButton>
         </div>
       </div>
@@ -143,7 +156,7 @@ async function handleLogout() {
               <button
                 :disabled="deletingId === p.id"
                 class="flex-1 h-8 rounded-lg bg-red-500/90 backdrop-blur-sm text-xs font-medium text-white hover:bg-red-500 transition disabled:opacity-60"
-                @click="deleteListing(p.id)"
+                @click="requestDelete(p.id)"
               >
                 {{ deletingId === p.id ? 'Deleting…' : 'Delete' }}
               </button>
@@ -152,8 +165,28 @@ async function handleLogout() {
         </div>
       </div>
 
+      <!-- Delete confirmation modal -->
+      <Teleport to="body">
+        <Transition name="fade">
+          <div v-if="confirmDeleteId" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-zinc-950/60 backdrop-blur-sm" @click="confirmDeleteId = null" />
+            <div class="relative w-full max-w-sm card p-6 animate-fade-up">
+              <div class="size-12 rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-6 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </div>
+              <h3 class="text-base font-semibold text-zinc-900 dark:text-zinc-100 text-center mb-1">Delete listing?</h3>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400 text-center mb-6">This action cannot be undone. The listing will be removed from all searches.</p>
+              <div class="flex gap-3">
+                <AppButton variant="secondary" full @click="confirmDeleteId = null">Cancel</AppButton>
+                <AppButton variant="danger" full @click="confirmDelete">Delete</AppButton>
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </Teleport>
+
       <!-- Saved / Favourites -->
-      <div v-else>
+      <div v-if="activeTab === 'favourites'">
         <div v-if="favPending" class="grid sm:grid-cols-2 gap-5">
           <PropertyCardSkeleton v-for="n in 4" :key="n" />
         </div>
@@ -171,3 +204,8 @@ async function handleLogout() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.fade-enter-active, .fade-leave-active { @apply transition-opacity duration-200; }
+.fade-enter-from, .fade-leave-to { @apply opacity-0; }
+</style>

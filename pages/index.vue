@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Property } from '~/types/property'
-import { useProperties } from '~/composables/useProperties'
 
 useSeoMeta({
   title: 'Explore Properties',
@@ -22,7 +21,7 @@ function submitHeroSearch() {
   }
 }
 
-const { fetchFeatured, formatPriceLabel, savingsAmount } = useProperties()
+const { fetchFeatured } = useProperties()
 
 const { data: featured, pending } = await useAsyncData('featured', fetchFeatured)
 
@@ -185,97 +184,12 @@ const categories = [
 
       <!-- Skeleton -->
       <div v-if="pending" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div v-for="i in 6" :key="i" class="rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800">
-          <div class="aspect-[4/3] shimmer" />
-          <div class="p-4 space-y-3">
-            <div class="h-4 w-2/3 shimmer rounded-lg" />
-            <div class="h-3 w-1/2 shimmer rounded-lg" />
-            <div class="h-5 w-1/3 shimmer rounded-lg" />
-          </div>
-        </div>
+        <PropertyCardSkeleton v-for="i in 6" :key="i" />
       </div>
 
       <!-- Results -->
       <div v-else-if="featured?.length" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <NuxtLink
-          v-for="prop in featured"
-          :key="prop.id"
-          :to="`/listings/${prop.id}`"
-          class="group card overflow-hidden animate-fade-up"
-        >
-          <!-- Image -->
-          <div class="aspect-[4/3] overflow-hidden relative">
-            <NuxtImg
-              :src="prop.images[0]"
-              :alt="prop.title"
-              class="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-              loading="lazy"
-              width="480"
-              height="360"
-            />
-            <!-- Badges -->
-            <div class="absolute top-3 left-3 flex gap-2">
-              <span
-                :class="[
-                  'text-xs font-semibold px-2.5 py-1 rounded-full',
-                  prop.type === 'rent'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-emerald-500 text-white',
-                ]"
-              >
-                {{ prop.type === 'rent' ? 'For Rent' : 'For Sale' }}
-              </span>
-              <span v-if="prop.offer" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-brand-500 text-zinc-900">
-                Offer
-              </span>
-            </div>
-          </div>
-
-          <!-- Info -->
-          <div class="p-4">
-            <p class="text-xs text-zinc-500 dark:text-zinc-400 mb-1">{{ prop.city }}, {{ prop.state }}</p>
-            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 text-sm leading-snug line-clamp-1 mb-3">
-              {{ prop.title }}
-            </h3>
-
-            <!-- Meta row -->
-            <div class="flex items-center gap-3 text-xs text-zinc-500 dark:text-zinc-400 mb-3">
-              <span class="flex items-center gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14"/><path d="M2 22h20"/><path d="M9 22V12h6v10"/></svg>
-                {{ prop.bedrooms === 0 ? 'Studio' : `${prop.bedrooms} bed` }}
-              </span>
-              <span class="flex items-center gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" y1="5" x2="8" y2="7"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-                {{ prop.bathrooms }} bath
-              </span>
-              <span v-if="prop.parking" class="flex items-center gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                Parking
-              </span>
-            </div>
-
-            <!-- Price -->
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="font-semibold text-zinc-900 dark:text-zinc-100">
-                  {{ formatPriceLabel(prop) }}
-                </span>
-                <span
-                  v-if="prop.offer && prop.discountedPrice"
-                  class="ml-2 text-xs text-zinc-400 line-through"
-                >
-                  {{ new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(prop.regularPrice) }}
-                </span>
-              </div>
-              <span
-                v-if="savingsAmount(prop)"
-                class="text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full"
-              >
-                Save {{ new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(savingsAmount(prop)!) }}
-              </span>
-            </div>
-          </div>
-        </NuxtLink>
+        <PropertyCard v-for="prop in featured" :key="prop.id" :property="prop" />
       </div>
 
       <div class="mt-8 text-center sm:hidden">

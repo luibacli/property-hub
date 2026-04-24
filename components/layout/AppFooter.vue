@@ -34,7 +34,7 @@
         <div>
           <h3 class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider mb-3">Account</h3>
           <ul class="space-y-2">
-            <li v-for="link in [['/auth/login', 'Sign in'], ['/auth/register', 'Register'], ['/profile', 'My Profile'], ['/create-listing', 'List Property']]" :key="link[0]">
+            <li v-for="link in [['/auth/login', 'Sign in'], ['/auth/register', 'Register'], ['/profile', 'My Profile'], ['/profile/create-listing', 'List Property']]" :key="link[0]">
               <NuxtLink :to="link[0]" class="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 {{ link[1] }}
               </NuxtLink>

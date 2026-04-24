@@ -1,6 +1,4 @@
 <script setup lang="ts">
-defineOptions({ inheritAttrs: false })
-
 defineProps<{
   modelValue?: string
   label?: string
@@ -15,7 +13,6 @@ const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
     <label v-if="label" class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ label }}</label>
     <div class="relative">
       <select
-        v-bind="$attrs"
         :value="modelValue"
         class="w-full appearance-none h-10 pl-3 pr-8 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
         @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"

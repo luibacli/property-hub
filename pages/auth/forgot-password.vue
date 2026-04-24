@@ -17,11 +17,14 @@ async function handleSubmit() {
   }
 
   loading.value = true
-  // Simulate a reset email — in production this calls /api/auth/forgot-password
-  await new Promise((r) => setTimeout(r, 1000))
-  loading.value = false
-  submitted.value = true
-  uiStore.success('Email sent', 'Check your inbox for reset instructions')
+  try {
+    await $fetch('/api/auth/forgot-password', { method: 'POST', body: { email: email.value } })
+    submitted.value = true
+  } catch {
+    error.value = 'Something went wrong. Please try again.'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
