@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+  }
+
+  html {
+    @apply antialiased scroll-smooth;
+  }
+
+  body {
+    @apply bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  *,
+  *::before,
+  *::after {
+    @apply border-zinc-200 dark:border-zinc-800;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-zinc-300 dark:bg-zinc-700;
+  }
+}
+
+@layer components {
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      theme('colors.zinc.100') 25%,
+      theme('colors.zinc.200') 50%,
+      theme('colors.zinc.100') 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+
+  .dark .shimmer {
+    background: linear-gradient(
+      90deg,
+      theme('colors.zinc.800') 25%,
+      theme('colors.zinc.700') 50%,
+      theme('colors.zinc.800') 75%
+    );
+    background-size: 200% 100%;
+  }
+
+  .page-container {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-title {
+    @apply text-2xl sm:text-3xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight;
+  }
+
+  .card {
+    @apply rounded-2xl border bg-white dark:bg-zinc-900 shadow-card hover:shadow-card-hover dark:shadow-card-dark dark:hover:shadow-card-hover-dark transition-shadow duration-200;
+  }
+}
