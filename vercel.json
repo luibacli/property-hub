@@ -1,10 +1,5 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".output/public",
   "framework": "nuxt",
-  "functions": {
-    "server/index.mjs": {
-      "includeFiles": ".output/server/**"
-    }
-  }
+  "buildCommand": "npm run build",
+  "installCommand": "npm install"
 }

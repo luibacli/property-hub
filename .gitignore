@@ -5,6 +5,9 @@
 .cache
 dist
 
+# Vercel
+.vercel
+
 # Node
 node_modules
 
@@ -17,3 +20,5 @@ node_modules
 
 # Logs
 *.log
+
+CLAUDE.md
