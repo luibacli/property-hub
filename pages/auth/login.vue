@@ -138,7 +138,7 @@ function fillDemo(type: 'buyer' | 'agent') {
     <!-- Right panel — image (hidden on mobile) -->
     <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col">
       <NuxtImg
-        src="https://images.unsplash.com/photo-1545324418-5e0b26d52a45?auto=format&fit=crop&w=900&q=80"
+        src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80"
         alt="Luxury property"
         class="size-full object-cover"
         loading="eager"
